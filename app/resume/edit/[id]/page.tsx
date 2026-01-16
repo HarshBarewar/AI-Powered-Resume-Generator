@@ -18,6 +18,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { TemplateSelector } from "@/components/template-selector"
 import { ResumeCustomizer } from "@/components/resume-customizer"
 
+export const dynamic = 'force-dynamic'
+
 type FormTab =
   | "personal"
   | "experience"

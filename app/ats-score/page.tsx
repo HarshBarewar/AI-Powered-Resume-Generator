@@ -12,6 +12,8 @@ import { Loader2, Calculator, CheckCircle, AlertCircle } from "lucide-react"
 import { getAllResumes, type ResumeData } from "@/lib/resume-storage"
 import type { ATSScore } from "@/lib/ats-calculator"
 
+export const dynamic = 'force-dynamic'
+
 export default function ATSScorePage() {
   const [resumes, setResumes] = useState<ResumeData[]>([])
   const [selectedResumeId, setSelectedResumeId] = useState<string>("")
