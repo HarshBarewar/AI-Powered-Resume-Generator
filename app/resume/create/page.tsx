@@ -21,6 +21,8 @@ import { ColorFontCustomizer } from "@/components/color-font-customizer"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 
 export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
 
 type FormTab =
   | "personal"
