@@ -20,6 +20,8 @@ import { useResume } from "@/contexts/resume-context"
 import { ColorFontCustomizer } from "@/components/color-font-customizer"
 import { AuthenticatedHeader } from "@/components/authenticated-header"
 
+export const dynamic = 'force-dynamic'
+
 type FormTab =
   | "personal"
   | "experience"
