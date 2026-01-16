@@ -4,6 +4,8 @@ import { Header } from "@/components/header"
 import { ResumeCustomizer } from "@/components/resume-customizer-new"
 import { ResumePreview } from "@/components/resume-preview"
 
+export const dynamic = 'force-dynamic'
+
 export default function CustomizePage() {
   return (
     <div className="min-h-screen bg-background">
