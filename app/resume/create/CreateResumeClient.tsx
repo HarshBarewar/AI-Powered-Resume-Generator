@@ -1,12 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
-import { getResumeById, updateResume } from "@/lib/resume-storage"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Logo } from "@/components/logo"
-import { ChevronLeft, Save } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { PersonalInfoForm } from "@/components/resume/personal-info-form"
 import { ExperienceForm } from "@/components/resume/experience-form"
 import { EducationForm } from "@/components/resume/education-form"
@@ -14,9 +11,12 @@ import { SkillsForm } from "@/components/resume/skills-form"
 import { ProjectsForm } from "@/components/resume/projects-form"
 import { CertificationsForm } from "@/components/resume/certifications-form"
 import { AchievementsForm } from "@/components/resume/achievements-form"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Save } from "lucide-react"
+import { saveResume } from "@/lib/resume-storage"
 import { TemplateSelector } from "@/components/template-selector"
-import { ResumeCustomizer } from "@/components/resume-customizer"
+import { useResume } from "@/contexts/resume-context"
+import { ColorFontCustomizer } from "@/components/color-font-customizer"
+import { AuthenticatedHeader } from "@/components/authenticated-header"
 
 type FormTab =
   | "personal"
@@ -28,15 +28,13 @@ type FormTab =
   | "achievements"
   | "customize"
 
-export default function EditResumePage() {
+export default function CreateResumeClient() {
   const router = useRouter()
-  const params = useParams()
-  const resumeId = params.id as string
-
+  const { customization } = useResume()
   const [activeTab, setActiveTab] = useState<FormTab>("personal")
   const [isSaving, setIsSaving] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [resumeTitle, setResumeTitle] = useState("")
+
   const [formData, setFormData] = useState({
     personal: {
       fullName: "",
@@ -53,17 +51,6 @@ export default function EditResumePage() {
     achievements: [{ title: "", description: "" }],
   })
 
-  useEffect(() => {
-    const resume = getResumeById(resumeId)
-    if (resume) {
-      setResumeTitle(resume.title)
-      setFormData(resume.data)
-      setIsLoading(false)
-    } else {
-      router.push("/dashboard")
-    }
-  }, [resumeId, router])
-
   const tabs: { id: FormTab; label: string; icon: string }[] = [
     { id: "personal", label: "Personal Info", icon: "👤" },
     { id: "experience", label: "Experience", icon: "💼" },
@@ -78,8 +65,20 @@ export default function EditResumePage() {
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const title = resumeTitle.trim() || resumeTitle
-      updateResume(resumeId, formData, title)
+      const title =
+        resumeTitle.trim() ||
+        (formData.personal.fullName
+          ? `${formData.personal.fullName}'s Resume`
+          : `Resume - ${new Date().toLocaleDateString()}`)
+      
+      saveResume(
+        {
+          ...formData,
+          customization,
+        },
+        title
+      )
+
       setTimeout(() => {
         setIsSaving(false)
         router.push("/dashboard")
@@ -90,56 +89,23 @@ export default function EditResumePage() {
     }
   }
 
-  const handleBack = () => {
-    router.push("/dashboard")
-  }
-
-  if (isLoading) {
-    return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading resume...</p>
-      </main>
-    )
-  }
-
   return (
     <main className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleBack}
-              className="p-2 hover:bg-muted rounded-lg transition-colors"
-              aria-label="Go back"
-            >
-              <ChevronLeft className="w-5 h-5 text-foreground" />
-            </button>
-            <div className="flex items-center gap-3">
-              <Logo />
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Edit Resume</h1>
-                <p className="text-sm text-muted-foreground">Update your professional resume</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AuthenticatedHeader />
 
       <div className="container mx-auto px-6 py-8">
+        <div className="mb-6 flex justify-end">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            {isSaving ? "Saving..." : "Save Resume"}
+          </Button>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
             <Card className="p-4 border border-border sticky top-24">
               <div className="mb-6">
@@ -170,7 +136,6 @@ export default function EditResumePage() {
             </Card>
           </div>
 
-          {/* Form Content */}
           <div className="lg:col-span-3">
             <Card className="p-8 border border-border">
               {activeTab === "personal" && (
@@ -222,7 +187,7 @@ export default function EditResumePage() {
               {activeTab === "customize" && (
                 <div className="space-y-8">
                   <TemplateSelector />
-                  <ResumeCustomizer />
+                  <ColorFontCustomizer />
                 </div>
               )}
             </Card>

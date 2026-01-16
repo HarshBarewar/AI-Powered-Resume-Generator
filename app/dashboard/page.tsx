@@ -11,8 +11,6 @@ import { getAllResumes, deleteResume, type ResumeData } from "@/lib/resume-stora
 import { AuthenticatedFooter } from "@/components/authenticated-footer"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export const dynamic = 'force-dynamic'
-
 export default function DashboardPage() {
   const router = useRouter()
   const [resumes, setResumes] = useState<ResumeData[]>([])

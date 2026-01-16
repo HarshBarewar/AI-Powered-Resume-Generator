@@ -10,8 +10,6 @@ import { AISuggestionsList } from "@/components/ai/ai-suggestions-list"
 import { AuthenticatedFooter } from "@/components/authenticated-footer"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export const dynamic = 'force-dynamic'
-
 export default function AISuggestionsPage() {
   const router = useRouter()
   const [resumes, setResumes] = useState<ResumeData[]>([])
